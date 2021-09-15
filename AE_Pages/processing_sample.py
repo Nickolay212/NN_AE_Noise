@@ -98,50 +98,52 @@ def show_sample(x, y, num_sample, num_img):
   plt.show()
 
 # ******************************************************************************************
-path_files = '../text_cleaning/' # путь к файлам
-variants_sample = os.listdir(path_files)
+def processing(path):
+    path_files = path # путь к файлам
+    variants_sample = os.listdir(path_files)
 
-train_X1,train_X2 = [],[]
-train_Y1, train_Y2 = [],[]
-test1, test2    = [],[]
-# Предварительная обработка изображений
-# Преобразование в матрицу, Сбор изображений в массивы по соотвествующим группам
-for temp in variants_sample:
-  path = os.path.join(path_files, temp) 
-  for image_ in np.sort(os.listdir(path)):
-    x = img2matrix(image_, path)
-    if temp == 'train_X':
-      if x.shape == (256, 544, 3):
-        train_X1.append(x)
-      else:
-        train_X2.append(x)
-    elif temp == 'train_Y':
-      if x.shape == (256, 544, 3):
-        train_Y1.append(x)
-      else:
-        train_Y2.append(x)
-    elif temp == 'test':
-      if x.shape == (256, 544, 3):
-        test1.append(x)
-      else:
-        test2.append(x)
+    train_X1,train_X2 = [],[]
+    train_Y1, train_Y2 = [],[]
+    test1, test2    = [],[]
+    # Предварительная обработка изображений
+    # Преобразование в матрицу, Сбор изображений в массивы по соотвествующим группам
+    for temp in variants_sample:
+      path = os.path.join(path_files, temp) 
+      for image_ in np.sort(os.listdir(path)):
+        x = img2matrix(image_, path)
+        if temp == 'train_X':
+          if x.shape == (256, 544, 3):
+            train_X1.append(x)
+          else:
+            train_X2.append(x)
+        elif temp == 'train_Y':
+          if x.shape == (256, 544, 3):
+            train_Y1.append(x)
+          else:
+            train_Y2.append(x)
+        elif temp == 'test':
+          if x.shape == (256, 544, 3):
+            test1.append(x)
+          else:
+            test2.append(x)
 
-# Картинки двух видов размера  (256, 544, 3), (416, 544, 3)  
-train_X1 = np.array(train_X1)
-train_X2 = np.array(train_X2)
-train_Y1 = np.array(train_Y1)
-train_Y2 = np.array(train_Y2)
-test1 = np.array(test1)
-test2 = np.array(test2)
+    # Картинки двух видов размера  (256, 544, 3), (416, 544, 3)  
+    train_X1 = np.array(train_X1)
+    train_X2 = np.array(train_X2)
+    train_Y1 = np.array(train_Y1)
+    train_Y2 = np.array(train_Y2)
+    test1 = np.array(test1)
+    test2 = np.array(test2)
 
-# Подготовка выборки для обучения (на фрагменты, объединение в массив)
-img_parts_x1, img_parts_y1 = division_img(train_X1[:40], train_Y1[:40])
-img_parts_x2, img_parts_y2 = division_img(train_X2[:90], train_Y2[:90])
-trainx = np.concatenate([img_parts_x1, img_parts_x2])
-trainy = np.concatenate([img_parts_y1, img_parts_y2])
+    # Подготовка выборки для обучения (на фрагменты, объединение в массив)
+    img_parts_x1, img_parts_y1 = division_img(train_X1[:40], train_Y1[:40])
+    img_parts_x2, img_parts_y2 = division_img(train_X2[:90], train_Y2[:90])
+    trainx = np.concatenate([img_parts_x1, img_parts_x2])
+    trainy = np.concatenate([img_parts_y1, img_parts_y2])
 
-# Подготовка выборки для тестирования (на фрагменты, объединение в массив)
-img_parts_x11, img_parts_y11 = division_img(train_X1[40:], train_Y1[40:])
-img_parts_x22, img_parts_y22 = division_img(train_X2[90:], train_Y2[90:])
-trainx_test = np.concatenate([img_parts_x11, img_parts_x22])
-trainy_test = np.concatenate([img_parts_y11, img_parts_y22])
+    # Подготовка выборки для тестирования (на фрагменты, объединение в массив)
+    img_parts_x11, img_parts_y11 = division_img(train_X1[40:], train_Y1[40:])
+    img_parts_x22, img_parts_y22 = division_img(train_X2[90:], train_Y2[90:])
+    trainx_test = np.concatenate([img_parts_x11, img_parts_x22])
+    trainy_test = np.concatenate([img_parts_y11, img_parts_y22])
+    return trainx, trainy, trainx_test, trainy_test, test1, test2

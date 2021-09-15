@@ -40,7 +40,3 @@ def part_img_test(x):
   trainx = np.array(trainx)
   return trainx
 
-# Деление тестовой выборки на фрагменты размером (32,32)
-img_parts_test = part_img_test(test1)
-img_parts_test2 = part_img_test(test2)
-
