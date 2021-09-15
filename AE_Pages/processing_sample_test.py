@@ -1,14 +1,38 @@
+import numpy as np
+
+def part_img(img): 
+  '''
+  Подготовка выборки, деление картинки на части
+  img - картинки в матричном виде с измененным размером
+  '''
+  x_max = img.shape[1]                          # выделение размера по оси x
+  y_max = img.shape[0]                          # выделение размера по оси y
+  img_parts = []
+  step = 32                                     # шаг разбиения
+  i, j = 0, 0
+  # разбиение картинки на фрагменты с размерами (32,32)
+  while j < y_max:
+    while i < x_max:
+      img_parts.append(img[j:j+step, i:i+step])
+      i+=step
+    i=0
+    j+=step
+  img_parts = np.array(img_parts)
+  return img_parts 
+
 def part_img_test(x):
   '''
-  Деление тестовых картинок на части
+  Деление тестовых картинок на фрагменты,
+  с помощью ф-ии part_img()
+  x - тестовая выборка
   '''
   trainx = np.array([])
 
   for i,img in enumerate(x):
-    img_parts_x = part_img(img)                      # Деление на мелкие части
+    img_parts_x = part_img(img)                      # Деление на фрагменты размером (32,32)
 
     try:
-      trainx = np.concatenate([trainx, img_parts_x]) # Объединение мелких частей в одну выборку
+      trainx = np.concatenate([trainx, img_parts_x]) # Объединение фрагментов в одну выборку
     except:
       trainx = img_parts_x
       print('!!!!!!!!!!! concatenate at the begining time', i, img_parts_x.shape)
@@ -16,48 +40,7 @@ def part_img_test(x):
   trainx = np.array(trainx)
   return trainx
 
-def merge_part_img(img, n): 
-  ''' 
-  Объединение тестовой выборки после predict
-  '''
-  k=0
-  for j in range(0, n):
-    for i in range(0, 16):
-      if i == 0:
-        x_test = np.concatenate([img[k], img[k+1]],axis=1)
-      else:
-        x_test = np.concatenate([x_test, img[k+1]],axis=1)
-      k+=1
-    k+=1
-
-    if j == 0:
-      xx_test = x_test
-    else:
-      xx_test = np.concatenate([xx_test, x_test],axis=0)
-  return xx_test
-
-def compare_part_img(img_parts_test, train_test):
-  temp = 0
-  n = int(train_test.shape[1]/32)
-  step = int(n*(train_test.shape[2]/32))
-  while temp < img_parts_test.shape[0]:
-    tes = merge_part_img(img_parts_test[temp:temp+step], n)
-    tes = np.expand_dims(tes, axis=0)
-    if temp == 0:
-      test_img = tes
-    else:
-      test_img = np.concatenate([test_img, tes])
-    temp+=step
-  return test_img
-
-# Деление тестовой выборки на мелкие части с шагом 32
+# Деление тестовой выборки на фрагменты размером (32,32)
 img_parts_test = part_img_test(test1)
 img_parts_test2 = part_img_test(test2)
 
-# Predict
-predict = modelUnet_main2.predict(img_parts_test)
-predict1 = modelUnet_main2.predict(img_parts_test2)
-
-# Целая тестовая картинка после predict
-predict11 = compare_part_img(predict, test1)
-predict22 = compare_part_img(predict1, test2)

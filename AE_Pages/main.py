@@ -11,6 +11,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 import processing_sample # предварительная обработка выборки
+import processing_sample_test 
+import merge_predict
+
+
 
 # Тестовая выборка (преобразование в матрицу)
 test1 =         processing_sample.test1
@@ -33,3 +37,14 @@ print('trainx_test = {}, trainy_test = {}'.format(trainx_test.shape, trainy_test
 processing_sample.show_sample(trainx_test, trainy_test, trainx_test.shape[0], 10)
 
 
+# Деление тестовой выборки на фрагменты размером (32,32)
+img_parts_test = part_img_test(test1)
+img_parts_test2 = part_img_test(test2)
+
+# Predict
+predict = modelUnet_main2.predict(img_parts_test)
+predict1 = modelUnet_main2.predict(img_parts_test2)
+
+# Целая тестовая картинка после predict
+predict11 = compare_part_img(predict, test1)
+predict22 = compare_part_img(predict1, test2)
